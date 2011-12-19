@@ -1057,7 +1057,7 @@ void bk_thread_kill_others(bk_s B, bk_flags flags)
    */
   pthread_kill_other_threads_np();
 #else /* HAVE_PTHREAD_KILL_OTHER_THREADS_NP */
-  struct bk_threadlist *tlist;
+  struct bk_threadlist *volatile tlist;
   struct bk_threadnode *tnode;
   dict_iter iter;
 

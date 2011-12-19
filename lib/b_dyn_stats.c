@@ -1595,6 +1595,7 @@ bk_dynamic_stats_getnext(bk_s B, bk_dynamic_stats_h stats_list, bk_dynamic_stat_
 do												\
 {												\
   typeof(value) __value;									\
+  int __vptr_ret = 0;										\
 												\
   if (((bds)->bds_access_type == DynamicStatsAccessTypeIndirect) && !bds->bds_ptr)		\
   {												\
@@ -1615,17 +1616,17 @@ do												\
 												\
     if ((bds)->bds_discriminator == 0)								\
     {												\
-      vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
-			     "%s\t<statistic description=\"%s\">%s</statistic>\n",		\
-			     prefix, (bds)->bds_name, __null_value);				\
+      __vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
+			       "%s\t<statistic description=\"%s\">%s</statistic>\n",		\
+			       prefix, (bds)->bds_name, __null_value);				\
     }												\
     else											\
     {												\
-      vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
-			     "%s\t<statistic description=\"%s\" discriminator=\"%ld\">%s"	\
-			     "</statistic>\n",							\
-			     prefix, (bds)->bds_name, (bds)->bds_discriminator,			\
-			     __null_value);							\
+      __vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
+			       "%s\t<statistic description=\"%s\" discriminator=\"%ld\">%s"	\
+			       "</statistic>\n",						\
+			       prefix, (bds)->bds_name, (bds)->bds_discriminator,		\
+			       __null_value);							\
     }												\
   }												\
   else												\
@@ -1641,17 +1642,22 @@ do												\
 												\
     if ((bds)->bds_discriminator == 0)								\
     {												\
-      vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
-			     "%s\t<statistic description=\"%s\">"fmt"</statistic>\n",		\
-			     prefix, (bds)->bds_name, __value);					\
+      __vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
+			       "%s\t<statistic description=\"%s\">"fmt"</statistic>\n",		\
+			       prefix, (bds)->bds_name, __value);				\
     }												\
     else											\
     {												\
-      vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
-			     "%s\t<statistic description=\"%s\" discriminator=\"%ld\">"fmt	\
-			     "</statistic>\n",							\
-			     prefix, (bds)->bds_name, (bds)->bds_discriminator, __value);	\
+      __vptr_ret = bk_vstr_cat(B, 0, &xml_vstr,							\
+			       "%s\t<statistic description=\"%s\" discriminator=\"%ld\">"fmt	\
+			       "</statistic>\n",						\
+			       prefix, (bds)->bds_name, (bds)->bds_discriminator, __value);	\
     }												\
+  }												\
+  if (__vptr_ret < 0)										\
+  {												\
+    bk_error_printf(B, BK_ERR_ERR, "Could not concatonate string into vptr\n");			\
+    goto error;											\
   }												\
 }while(0);
 
@@ -1731,7 +1737,6 @@ bk_dynamic_stats_XML_create(bk_s B, bk_dynamic_stats_h stats_list, u_int priorit
 
   while((ret = bdsl_getnext(B, bdsl, &bds, priority, NULL, NULL, 0)) == 1)
   {
-    int vptr_ret;
     switch(bds->bds_value_type)
     {
     case DynamicStatsValueTypeInt32:
